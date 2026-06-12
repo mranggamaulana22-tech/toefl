@@ -1,22 +1,61 @@
-// src/hooks/useStudentDashboard.ts
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import {
+  clearAuthSession,
+  getAuthTokenSnapshot,
+  getAuthUserRawSnapshot,
+  getServerAuthSnapshot,
+  parseAuthUser,
+  subscribeAuthSession,
+} from "@/lib/auth-session";
 
 export function useStudentDashboard() {
   const router = useRouter();
+
+  const token = useSyncExternalStore(
+    subscribeAuthSession,
+    getAuthTokenSnapshot,
+    getServerAuthSnapshot
+  );
+
+  const rawUser = useSyncExternalStore(
+    subscribeAuthSession,
+    getAuthUserRawSnapshot,
+    getServerAuthSnapshot
+  );
+
+  const user = useMemo(() => {
+    return parseAuthUser(rawUser);
+  }, [rawUser]);
+
   const [isReady, setIsReady] = useState(false);
   const [hasTakenTest, setHasTakenTest] = useState(false);
 
+  useEffect(() => {
+    if (!token) {
+      router.replace("/login");
+    }
+  }, [token, router]);
+
   const handleStartExam = () => {
     if (!isReady) return;
-    router.push('/student/exam');
+    router.push("/student/exam");
   };
 
-  const toggleDemoMode = () => setHasTakenTest(!hasTakenTest);
-  const handleLogout = () => router.push('/login');
+  const toggleDemoMode = () => {
+    setHasTakenTest((previous) => !previous);
+  };
+
+  const handleLogout = () => {
+    clearAuthSession();
+    router.replace("/login");
+  };
 
   return {
+    token,
+    user,
     isReady,
     setIsReady,
     hasTakenTest,
