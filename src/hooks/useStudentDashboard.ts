@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   clearAuthSession,
+  getAuthRoleSnapshot,
   getAuthTokenSnapshot,
   getAuthUserRawSnapshot,
   getServerAuthSnapshot,
@@ -17,6 +18,12 @@ export function useStudentDashboard() {
   const token = useSyncExternalStore(
     subscribeAuthSession,
     getAuthTokenSnapshot,
+    getServerAuthSnapshot
+  );
+
+  const role = useSyncExternalStore(
+    subscribeAuthSession,
+    getAuthRoleSnapshot,
     getServerAuthSnapshot
   );
 
@@ -36,8 +43,13 @@ export function useStudentDashboard() {
   useEffect(() => {
     if (!token) {
       router.replace("/login");
+      return;
     }
-  }, [token, router]);
+
+    if (role === "admin") {
+      router.replace("/admin/questions");
+    }
+  }, [token, role, router]);
 
   const handleStartExam = () => {
     if (!isReady) return;
@@ -55,6 +67,7 @@ export function useStudentDashboard() {
 
   return {
     token,
+    role,
     user,
     isReady,
     setIsReady,

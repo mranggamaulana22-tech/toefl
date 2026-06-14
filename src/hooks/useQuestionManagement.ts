@@ -46,7 +46,7 @@ export function useQuestionManagement() {
       section,
       question_text: questionText,
       options,
-      correct_answer: correctAnswer,
+      correctAnswer,
       ...(section === 'reading' && { passage_text: passageText }),
       ...(section === 'listening' && { audio_url: audioUrl }),
     };

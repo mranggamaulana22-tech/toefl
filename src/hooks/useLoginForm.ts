@@ -42,14 +42,14 @@ export function useLoginForm() {
         throw new Error("Login berhasil, tetapi token tidak ditemukan.");
       }
 
-      saveAuthSession(token, user);
+      const session = saveAuthSession(token, user);
 
-      if (user?.role_id === 2 || user?.role === "admin") {
-        router.push("/admin/students");
+      if (session.role === "admin") {
+        router.replace("/admin/questions");
         return;
       }
 
-      router.push("/student/dashboard");
+      router.replace("/student/dashboard");
     } catch (error) {
       const message =
         error instanceof Error

@@ -10,7 +10,7 @@ type QuestionTableProps = {
 
 export default function QuestionTable({ questions, onEdit, onDelete }: QuestionTableProps) {
   return (
-    <div className="max-w-6xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs font-medium">
           <thead>
@@ -42,7 +42,7 @@ export default function QuestionTable({ questions, onEdit, onDelete }: QuestionT
                 <td className="p-4 max-w-md truncate text-slate-800">
                   {question.question_text}
                 </td>
-                <td className="p-4 text-center text-slate-900 font-extrabold">{question.correct_answer}</td>
+                <td className="p-4 text-center text-slate-900 font-extrabold">{question.correctAnswer ?? "-"}</td>
                 <td className="p-4 text-right space-x-2">
                   <button onClick={() => onEdit(question)} className="text-xs font-bold text-blue-600 hover:underline">
                     Edit
