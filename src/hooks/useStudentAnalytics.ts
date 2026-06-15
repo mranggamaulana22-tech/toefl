@@ -20,7 +20,7 @@ export function useStudentAnalytics() {
   ];
 
   const handleRetake = () => {
-    router.push('/student/exam');
+    router.push('/student/exam/listening');
   };
 
   return {

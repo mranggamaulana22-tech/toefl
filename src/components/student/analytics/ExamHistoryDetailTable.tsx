@@ -1,8 +1,17 @@
 // src/components/student/analytics/ExamHistoryDetailTable.tsx
 'use client';
 
+type ExamHistoryRecord = {
+  id: string;
+  date: string;
+  listening: number;
+  structure: number;
+  reading: number;
+  total: number;
+};
+
 interface ExamHistoryDetailTableProps {
-  examRecords: any[];
+  examRecords: ExamHistoryRecord[];
 }
 
 export default function ExamHistoryDetailTable({ examRecords }: ExamHistoryDetailTableProps) {

@@ -8,7 +8,7 @@ interface StartAssessmentBoxProps {
   hasTakenTest: boolean;
 }
 
-export default function StartAssessmentBox({ isReady, setIsReady, onStart, hasTakenTest }: StartAssessmentBoxProps) {
+export default function StartAssessmentBox({ isReady, setIsReady, onStart }: StartAssessmentBoxProps) {
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
       <div className="flex items-start gap-3">

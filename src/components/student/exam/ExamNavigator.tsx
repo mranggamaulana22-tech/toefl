@@ -1,16 +1,17 @@
 // src/components/student/exam/ExamNavigator.tsx
 'use client';
-import { TOEFLQuestion } from '@/mocks/questionMock';
+import type { StudentAnswer, TOEFLQuestion } from '@/types/exam';
 
 interface ExamNavigatorProps {
   questions: TOEFLQuestion[];
   currentIndex: number;
   setCurrentIndex: (idx: number) => void;
-  answers: any[];
+  answers: StudentAnswer[];
+  isSubmitting: boolean;
   onSubmit: () => void;
 }
 
-export default function ExamNavigator({ questions, currentIndex, setCurrentIndex, answers, onSubmit }: ExamNavigatorProps) {
+export default function ExamNavigator({ questions, currentIndex, setCurrentIndex, answers, isSubmitting, onSubmit }: ExamNavigatorProps) {
   return (
     <div className="w-full lg:w-70 bg-[#1e293b] text-white rounded-2xl p-5 shadow-lg border border-slate-700/50 flex flex-col justify-between animate-fade-in shrink-0">
       <div>
@@ -52,10 +53,12 @@ export default function ExamNavigator({ questions, currentIndex, setCurrentIndex
         </div>
 
         <button
+          type="button"
           onClick={onSubmit}
-          className="w-full py-3 bg-white hover:bg-slate-100 text-slate-900 text-xs font-extrabold rounded-xl transition-all shadow-md transform active:scale-95"
+          disabled={isSubmitting}
+          className="w-full py-3 bg-white hover:bg-slate-100 disabled:opacity-60 disabled:cursor-not-allowed text-slate-900 text-xs font-extrabold rounded-xl transition-all shadow-md transform active:scale-95"
         >
-          Submit Section
+          {isSubmitting ? 'Mengirim Jawaban...' : 'Selesai Ujian'}
         </button>
       </div>
     </div>

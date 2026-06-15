@@ -53,7 +53,7 @@ export function useStudentDashboard() {
 
   const handleStartExam = () => {
     if (!isReady) return;
-    router.push("/student/exam");
+    router.push("/student/exam/listening");
   };
 
   const toggleDemoMode = () => {

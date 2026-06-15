@@ -1,8 +1,20 @@
 // src/components/student/history/HistoryCardList.tsx
 'use client';
 
+type HistoryExamRecord = {
+  id: string;
+  status: string;
+  type: string;
+  date: string;
+  listening: number;
+  structure: number;
+  reading: number;
+  total: number;
+  trend?: string;
+};
+
 interface HistoryCardListProps {
-  data: any[];
+  data: HistoryExamRecord[];
   onViewAnalytics: () => void;
 }
 
@@ -28,7 +40,7 @@ export default function HistoryCardList({ data, onViewAnalytics }: HistoryCardLi
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {['listening', 'structure', 'reading'].map((sec) => (
+            {(['listening', 'structure', 'reading'] as const).map((sec) => (
               <div key={sec} className="bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-center min-w-[80px]">
                 <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5 capitalize">{sec}</span>
                 <span className="text-sm font-black text-slate-700">{exam[sec]}</span>

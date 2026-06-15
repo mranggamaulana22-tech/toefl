@@ -1,9 +1,19 @@
 // src/components/student/analytics/ProfileOverviewCard.tsx
 'use client';
 
+type SectionMetric = {
+  name: string;
+  status: string;
+  score: number;
+  borderColor: string;
+  textColor: string;
+  progress: number;
+  barColor: string;
+};
+
 interface ProfileOverviewCardProps {
   studentInfo: { name: string; id: string; totalEstimatedScore: number };
-  sectionMetrics: any[];
+  sectionMetrics: SectionMetric[];
 }
 
 export default function ProfileOverviewCard({ studentInfo, sectionMetrics }: ProfileOverviewCardProps) {
