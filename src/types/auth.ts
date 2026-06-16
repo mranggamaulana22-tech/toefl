@@ -7,6 +7,7 @@ export type AuthUser = {
   id?: number;
   id_users?: number;
   id_student?: string;
+  student_id?: string;
   full_name?: string;
   nama?: string;
   email?: string;

@@ -3,9 +3,10 @@
 
 interface HistoryHeaderProps {
   totalExams: number;
+  bestScore: number;
 }
 
-export default function HistoryHeader({ totalExams }: HistoryHeaderProps) {
+export default function HistoryHeader({ totalExams, bestScore }: HistoryHeaderProps) {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
       <div>
@@ -22,7 +23,7 @@ export default function HistoryHeader({ totalExams }: HistoryHeaderProps) {
         </div>
         <div className="bg-white border border-slate-200 rounded-xl px-5 py-3 shadow-sm flex flex-col items-center min-w-[120px]">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Best Score</span>
-          <span className="text-2xl font-black text-[#11b981] mt-1">540</span>
+          <span className="text-2xl font-black text-[#11b981] mt-1">{bestScore || '-'}</span>
         </div>
       </div>
     </div>
