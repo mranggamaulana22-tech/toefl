@@ -10,7 +10,7 @@ import type {
 type UnknownRecord = Record<string, unknown>;
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8081/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://141.11.25.98:8081/api/v1";
 
 export const sectionOrder: ExamSection[] = ["listening", "structure", "reading"];
 export const sectionLabels: Record<ExamSection, string> = {
