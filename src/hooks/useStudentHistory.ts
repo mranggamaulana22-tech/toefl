@@ -10,8 +10,8 @@ import {
   getAuthUser,
   getUserFromToken,
 } from '@/lib/auth-session';
-import { scoreService } from '@/services/score.service';
-import type { StudentScoreHistoryItem } from '@/types/score';
+import { mlResultService } from '@/services/ml-result.service';
+import type { MLResultHistoryItem } from '@/types/ml-result';
 
 function resolveStudentId() {
   const token = getAuthToken();
@@ -28,7 +28,7 @@ function resolveStudentId() {
 
 export function useStudentHistory() {
   const router = useRouter();
-  const [historyData, setHistoryData] = useState<StudentScoreHistoryItem[]>([]);
+  const [historyData, setHistoryData] = useState<MLResultHistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -56,14 +56,14 @@ export function useStudentHistory() {
     setErrorMessage('');
 
     try {
-      const scores = await scoreService.getStudentScoreHistory(studentId, token);
-      setHistoryData(scores);
+      const results = await mlResultService.getHistoryByStudent(studentId, token);
+      setHistoryData(results);
     } catch (error) {
       setHistoryData([]);
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : 'Gagal mengambil data history nilai dari server.'
+          : 'Gagal mengambil data history ML result dari server.'
       );
     } finally {
       setIsLoading(false);
@@ -80,7 +80,7 @@ export function useStudentHistory() {
 
   const bestScore = useMemo(() => {
     if (historyData.length === 0) return 0;
-    return Math.max(...historyData.map((item) => item.total));
+    return Math.max(...historyData.map((item) => item.totalAccuracy));
   }, [historyData]);
 
   const hasHistory = historyData.length > 0;
@@ -88,7 +88,7 @@ export function useStudentHistory() {
   return {
     hasHistory,
     historyData,
-    bestScore,
+    bestScore: Math.round(bestScore),
     isLoading,
     errorMessage,
     refreshHistory: loadHistory,

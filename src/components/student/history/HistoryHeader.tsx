@@ -22,8 +22,8 @@ export default function HistoryHeader({ totalExams, bestScore }: HistoryHeaderPr
           <span className="text-2xl font-black text-slate-800 mt-1">{totalExams}</span>
         </div>
         <div className="bg-white border border-slate-200 rounded-xl px-5 py-3 shadow-sm flex flex-col items-center min-w-[120px]">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Best Score</span>
-          <span className="text-2xl font-black text-[#11b981] mt-1">{bestScore || '-'}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Best Accuracy</span>
+          <span className="text-2xl font-black text-[#11b981] mt-1">{bestScore ? `${bestScore}%` : '-'}</span>
         </div>
       </div>
     </div>
