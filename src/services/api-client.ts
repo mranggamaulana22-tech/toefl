@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://141.11.25.98:8081/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.toeflrecom.my.id/api/v1";
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

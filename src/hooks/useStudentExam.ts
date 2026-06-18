@@ -13,6 +13,7 @@ import { examService } from "@/services/exam.service";
 import type { AnswerOption, ExamSection, StudentAnswer, TOEFLQuestion } from "@/types/exam";
 
 const EXAM_DRAFT_KEY = "toefl_exam_answers_draft";
+const EXAM_QUESTIONS_DRAFT_KEY = "toefl_exam_questions_draft";
 const EXAM_DURATION_SECONDS = 45 * 60;
 
 function getStudentIdFromSession(token: string | null) {
@@ -51,6 +52,39 @@ function saveDraftAnswers(storageKey: string, answers: StudentAnswer[]) {
 }
 
 function clearDraftAnswers(storageKey: string) {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(storageKey);
+}
+
+function readDraftQuestions(storageKey: string): TOEFLQuestion[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const rawDraft = localStorage.getItem(storageKey);
+    if (!rawDraft) return [];
+
+    const parsedDraft = JSON.parse(rawDraft) as TOEFLQuestion[];
+
+    if (!Array.isArray(parsedDraft)) return [];
+
+    return parsedDraft.filter((item) => {
+      return (
+        typeof item.id === "string" &&
+        typeof item.section === "string" &&
+        typeof item.question_text === "string"
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+function saveDraftQuestions(storageKey: string, questions: TOEFLQuestion[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(storageKey, JSON.stringify(questions));
+}
+
+function clearDraftQuestions(storageKey: string) {
   if (typeof window === "undefined") return;
   localStorage.removeItem(storageKey);
 }
@@ -98,21 +132,28 @@ export function useStudentExam(activeSection: ExamSection) {
   const isSectionLastQuestion = currentIndex === sectionQuestions.length - 1;
   const canGoPrev = currentIndex > 0 || previousSection !== null;
 
-  const loadQuestions = useCallback(async () => {
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
+  const questionsKey = useMemo(
+    () => `${EXAM_QUESTIONS_DRAFT_KEY}_${studentId || "unknown"}`,
+    [studentId]
+  );
 
-    try {
-      setIsLoading(true);
-      setIsDraftReady(false);
-      setErrorMessage("");
+const loadQuestions = useCallback(async () => {
+  if (!token) {
+    router.replace("/login");
+    return;
+  }
 
-      const fetchedQuestions = await examService.getExamQuestions(token);
-      const questionIds = new Set(fetchedQuestions.map((question) => question.id));
+  try {
+    setIsLoading(true);
+    setIsDraftReady(false);
+    setErrorMessage("");
 
-      setAllQuestions(fetchedQuestions);
+    const cachedQuestions = readDraftQuestions(questionsKey);
+
+    if (cachedQuestions.length > 0) {
+      const questionIds = new Set(cachedQuestions.map((question) => question.id));
+
+      setAllQuestions(cachedQuestions);
       setAnswers(
         readDraftAnswers(draftKey).filter((answer) =>
           questionIds.has(answer.question_id)
@@ -120,17 +161,33 @@ export function useStudentExam(activeSection: ExamSection) {
       );
       setCurrentIndex(0);
       setIsDraftReady(true);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Gagal mengambil data soal ujian.";
-
-      setErrorMessage(message);
-    } finally {
-      setIsLoading(false);
+      return;
     }
-  }, [draftKey, router, token]);
+
+    const fetchedQuestions = await examService.getExamQuestions(token);
+    const questionIds = new Set(fetchedQuestions.map((question) => question.id));
+
+    saveDraftQuestions(questionsKey, fetchedQuestions);
+
+    setAllQuestions(fetchedQuestions);
+    setAnswers(
+      readDraftAnswers(draftKey).filter((answer) =>
+        questionIds.has(answer.question_id)
+      )
+    );
+    setCurrentIndex(0);
+    setIsDraftReady(true);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Gagal mengambil data soal ujian.";
+
+    setErrorMessage(message);
+  } finally {
+    setIsLoading(false);
+  }
+}, [draftKey, questionsKey, router, token]);
 
   useEffect(() => {
     // Data semua section dimuat sekali agar submit akhir tetap berisi jawaban Listening, Structure, dan Reading.
@@ -166,7 +223,11 @@ export function useStudentExam(activeSection: ExamSection) {
   }, [timeLeft, isLoading, isSubmitting]);
 
   const currentAnswerObj = currentQuestion
-    ? answers.find((answer) => answer.question_id === currentQuestion.id)
+    ? answers.find(
+        (answer) =>
+          answer.question_id === currentQuestion.id &&
+          answer.section === currentQuestion.section
+      )
     : undefined;
   const currentAnswer = currentAnswerObj?.selected_answer;
 
@@ -176,18 +237,20 @@ export function useStudentExam(activeSection: ExamSection) {
     section: StudentAnswer["section"]
   ) => {
     setAnswers((previousAnswers) => {
-      const filteredAnswers = previousAnswers.filter(
-        (item) => item.question_id !== questionId
-      );
-
-      return [
-        ...filteredAnswers,
+      const nextAnswers = [
+        ...previousAnswers.filter(
+          (item) => !(item.question_id === questionId && item.section === section)
+        ),
         {
           question_id: questionId,
           section,
           selected_answer: answer,
         },
       ];
+
+      saveDraftAnswers(draftKey, nextAnswers);
+
+      return nextAnswers;
     });
   };
 
@@ -261,6 +324,7 @@ export function useStudentExam(activeSection: ExamSection) {
       );
 
       clearDraftAnswers(draftKey);
+      clearDraftQuestions(questionsKey);
       router.replace("/student/dashboard");
     } catch (error) {
       const message =
